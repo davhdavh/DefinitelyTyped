@@ -8,8 +8,11 @@
 //                 Mathias Lorenzen <https://github.com/ffMathy>,
 //                 Leonardo Lombardi <https://github.com/ltlombardi>
 //                 Retsam <https://github.com/Retsam>
+//                 Dennis Haney <https://github.com/davhdavh>
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 // TypeScript Version: 2.3
+
+type KnockoutAble<T> = KnockoutObservable<T> | T;
 
 interface KnockoutSubscribableFunctions<T> {
     /**
@@ -54,6 +57,7 @@ interface KnockoutReadonlyObservableArrayFunctions<T> {
       */
     slice(start: number, end?: number): T[];
 }
+
 // The functions of observable arrays that mutate the array
 interface KnockoutObservableArrayFunctions<T> extends KnockoutReadonlyObservableArrayFunctions<T> {
     /**
@@ -169,21 +173,21 @@ interface KnockoutSubscribable<T> extends KnockoutSubscribableFunctions<T> {
      * @param target Defines the value of 'this' in the callback function.
      * @param event The knockout event name.
      */
-    subscribe(callback: (newValue: T) => void, target?: any, event?: "change"): KnockoutSubscription;
+    subscribe<K = any>(callback: (this: K, newValue: T) => void, target?: K, event?: "change"): KnockoutSubscription;
     /**
      * Registers to be notified before the observable's value changes.
      * @param callback Function that is called whenever the notification happens.
      * @param target Defines the value of 'this' in the callback function.
      * @param event The knockout event name.
      */
-    subscribe(callback: (newValue: T) => void, target: any, event: "beforeChange"): KnockoutSubscription;
+    subscribe<K = any>(callback: (this: K, newValue: T) => void, target: K, event: "beforeChange"): KnockoutSubscription;
     /**
      * Registers to be notified when a knockout or user defined event happens.
      * @param callback Function that is called whenever the notification happens. eventValue can be anything. No relation to underlying observable.
      * @param target Defines the value of 'this' in the callback function.
      * @param event The knockout or user defined event name.
      */
-    subscribe<U>(callback: (eventValue: U) => void, target: any, event: string): KnockoutSubscription;
+    subscribe<U, K = any>(callback: (this: K, eventValue: U) => void, target: K, event: string): KnockoutSubscription;
     /**
      * Customizes observables basic functionality.
      * @param requestedExtenders Name of the extender feature and its value, e.g. { notify: 'always' }, { rateLimit: 50 }
@@ -213,13 +217,13 @@ interface KnockoutComputedStatic {
      * @param context Defines the value of 'this' when evaluating the computed observable.
      * @param options An object with further properties for the computed observable.
      */
-    <T>(evaluatorFunction: () => T, context?: any, options?: KnockoutComputedOptions<T>): KnockoutComputed<T>;
+    <T, K = any>(evaluatorFunction: () => T, context?: K, options?: KnockoutComputedOptions<T, K>): KnockoutComputed<T>;
     /**
      * Creates computed observable.
      * @param options An object that defines the computed observable options and behavior.
      * @param context Defines the value of 'this' when evaluating the computed observable.
      */
-    <T>(options: KnockoutComputedDefine<T>, context?: any): KnockoutComputed<T>;
+    <T, K = any>(options: KnockoutComputedDefine<T, K>, context?: K): KnockoutComputed<T>;
 }
 
 interface KnockoutReadonlyComputed<T> extends KnockoutReadonlyObservable<T> {
@@ -261,10 +265,10 @@ interface KnockoutObservableArrayStatic {
  */
 interface KnockoutReadonlyObservableArray<T> extends KnockoutReadonlyObservable<ReadonlyArray<T>>, KnockoutReadonlyObservableArrayFunctions<T> {
     // NOTE: Keep in sync with KnockoutObservableArray<T>, see note on KnockoutObservableArray<T>
-    subscribe(callback: (newValue: KnockoutArrayChange<T>[]) => void, target: any, event: "arrayChange"): KnockoutSubscription;
-    subscribe(callback: (newValue: T[]) => void, target: any, event: "beforeChange"): KnockoutSubscription;
-    subscribe(callback: (newValue: T[]) => void, target?: any, event?: "change"): KnockoutSubscription;
-    subscribe<U>(callback: (newValue: U) => void, target: any, event: string): KnockoutSubscription;
+    subscribe<K = any>(callback: (this: K, newValue: KnockoutArrayChange<T>[]) => void, target: K, event: "arrayChange"): KnockoutSubscription;
+    subscribe<K = any>(callback: (this: K, newValue: T[]) => void, target: K, event: "beforeChange"): KnockoutSubscription;
+    subscribe<K = any>(callback: (this: K, newValue: T[]) => void, target?: K, event?: "change"): KnockoutSubscription;
+    subscribe<U, K = any>(callback: (this: K, newValue: U) => void, target: K, event: string): KnockoutSubscription;
 }
 
 /*
@@ -273,10 +277,10 @@ interface KnockoutReadonlyObservableArray<T> extends KnockoutReadonlyObservable<
     So it extends KnockoutObservable<T[]> and duplicates the subscribe definitions, which should be kept in sync
 */
 interface KnockoutObservableArray<T> extends KnockoutObservable<T[]>, KnockoutObservableArrayFunctions<T> {
-    subscribe(callback: (newValue: KnockoutArrayChange<T>[]) => void, target: any, event: "arrayChange"): KnockoutSubscription;
-    subscribe(callback: (newValue: T[]) => void, target: any, event: "beforeChange"): KnockoutSubscription;
-    subscribe(callback: (newValue: T[]) => void, target?: any, event?: "change"): KnockoutSubscription;
-    subscribe<U>(callback: (newValue: U) => void, target: any, event: string): KnockoutSubscription;
+    subscribe<K = any>(callback: (this: K, newValue: KnockoutArrayChange<T>[]) => void, target: K, event: "arrayChange"): KnockoutSubscription;
+    subscribe<K = any>(callback: (this: K, newValue: T[]) => void, target: K, event: "beforeChange"): KnockoutSubscription;
+    subscribe<K = any>(callback: (this: K, newValue: T[]) => void, target?: K, event?: "change"): KnockoutSubscription;
+    subscribe<U, K = any>(callback: (this: K, newValue: U) => void, target: K, event: string): KnockoutSubscription;
 
     extend(requestedExtenders: { [key: string]: any; }): KnockoutObservableArray<T>;
 }
@@ -315,13 +319,13 @@ interface KnockoutObservable<T> extends KnockoutReadonlyObservable<T> {
     extend(requestedExtenders: { [key: string]: any; }): KnockoutObservable<T>;
 }
 
-interface KnockoutComputedOptions<T> {
+interface KnockoutComputedOptions<T, K = any> {
     /**
      * Makes the computed observable writable. This is a function that receives values that other code is trying to write to your computed observable.
      * It’s up to you to supply custom logic to handle the incoming values, typically by writing the values to some underlying observable(s).
      * @param value Value being written to the computer observable.
      */
-    write?(value: T): void;
+    write?(this: K, value: T): void;
     /**
      * Disposal of the computed observable will be triggered when the specified DOM node is removed by KO.
      * This feature is used to dispose computed observables used in bindings when nodes are removed by the template and control-flow bindings.
@@ -335,7 +339,7 @@ interface KnockoutComputedOptions<T> {
     /**
      * Defines the value of 'this' whenever KO invokes your 'read' or 'write' callbacks.
      */
-    owner?: any;
+    owner?: K;
     /**
      * If true, then the value of the computed observable will not be evaluated until something actually attempts to access its value or manually subscribes to it.
      * By default, a computed observable has its value determined immediately during creation.
@@ -347,11 +351,11 @@ interface KnockoutComputedOptions<T> {
     pure?: boolean;
 }
 
-interface KnockoutComputedDefine<T> extends KnockoutComputedOptions<T> {
+interface KnockoutComputedDefine<T, K = any> extends KnockoutComputedOptions<T, K> {
     /**
      * A function that is used to evaluate the computed observable’s current value.
      */
-    read(): T;
+    read(this: K): T;
 }
 
 interface KnockoutBindingContext {
@@ -454,6 +458,8 @@ interface KnockoutVirtualElements {
 }
 
 interface KnockoutExtenders {
+    [bindingHandler: string]: ((target: any, ...any: any[]) => any);
+
     throttle(target: any, timeout: number): KnockoutComputed<any>;
     notify(target: any, notifyWhen: string): any;
 
@@ -523,6 +529,7 @@ interface KnockoutUtils {
 
     getFormFields(form: any, fieldName: string): any[];
 
+    objectForEach<T, K extends keyof T>(obj: T, action: (key: K, value: T[K]) => void): void;
     objectForEach(obj: any, action: (key: any, value: any) => void): void;
 
     parseHtmlFragment(html: string): any[];
@@ -549,7 +556,7 @@ interface KnockoutUtils {
 
     triggerEvent(element: any, eventType: any): void;
 
-    unwrapObservable<T>(value: KnockoutObservable<T> | T): T;
+    unwrapObservable<T>(value: KnockoutAble<T>): T;
     unwrapObservable<T>(value: KnockoutObservableArray<T> | T[]): T[];
 
     // NOT PART OF THE MINIFIED API SURFACE (ONLY IN knockout-{version}.debug.js) https://github.com/SteveSanderson/knockout/issues/670
@@ -646,11 +653,27 @@ interface KnockoutTasks {
 }
 
 /////////////////////////////////
+
+type KnockoutMapToJS<T> =
+    T extends KnockoutObservable<infer U> ? U :
+    T extends Function ? undefined :
+    T extends string ? string :
+    T extends number ? number :
+    T extends boolean ? boolean :
+    T extends KnockoutObservable<infer U>[] ? U[] :
+    T extends (infer U)[] ? U[] :
+    T extends Object ? { [K in keyof T]: KnockoutMapToJS<T[K]> } :
+    T;
+
+type KnockoutRecursiveMapToJS<T> = KnockoutMapToJS<KnockoutMapToJS<KnockoutMapToJS<KnockoutMapToJS<KnockoutMapToJS<KnockoutMapToJS<KnockoutMapToJS<T>>>>>>>;
+
+
 interface KnockoutStatic {
     utils: KnockoutUtils;
     memoization: KnockoutMemoization;
 
     bindingHandlers: KnockoutBindingHandlers;
+    getBindingHandler<K extends keyof KnockoutBindingHandlers>(handler: K): KnockoutBindingHandlers[K];
     getBindingHandler(handler: string): KnockoutBindingHandler;
 
     virtualElements: KnockoutVirtualElements;
@@ -673,13 +696,13 @@ interface KnockoutStatic {
      * @param evaluatorFunction Function that computes the observable value.
      * @param context Defines the value of 'this' when evaluating the computed observable.
      */
-    pureComputed<T>(evaluatorFunction: () => T, context?: any): KnockoutComputed<T>;
+    pureComputed<T, K = any>(evaluatorFunction: (this: K) => T, context?: K): KnockoutComputed<T>;
     /**
      * Creates a pure computed observable.
      * @param options An object that defines the computed observable options and behavior.
      * @param context Defines the value of 'this' when evaluating the computed observable.
      */
-    pureComputed<T>(options: KnockoutComputedDefine<T>, context?: any): KnockoutComputed<T>;
+    pureComputed<T, K = any>(options: KnockoutComputedDefine<T, K>, context?: K): KnockoutComputed<T>;
 
     observableArray: KnockoutObservableArrayStatic;
 
@@ -688,6 +711,7 @@ interface KnockoutStatic {
      * @param instance Instance to be evaluated.
      */
     isSubscribable(instance: any): instance is KnockoutSubscribable<any>;
+
     /**
      * Clones object substituting each observable for it's underlying value. Uses browser JSON.stringify internally to stringify the result.
      * @param viewModel Object with observables to be converted.
@@ -695,41 +719,29 @@ interface KnockoutStatic {
      * @param space Used to insert white space into the output JSON string for readability purposes.
      */
     toJSON(viewModel: any, replacer?: Function | [string | number], space?: string | number): string;
+
     /**
      * Clones object substituting for each observable the current value of that observable.
      * @param viewModel Object with observables to be converted.
      */
-    toJS(viewModel: any): any;
+    toJS<T>(viewModel: T): KnockoutRecursiveMapToJS<T>;
+
     /**
      * Determine if argument is an observable. Returns true for observables, observable arrays, and all computed observables.
      * @param instance Object to be checked.
      */
-    isObservable(instance: any): instance is KnockoutObservable<any>;
-    /**
-     * Determine if argument is an observable. Returns true for observables, observable arrays, and all computed observables.
-     * @param instance Object to be checked.
-     */
-    isObservable<T>(instance: KnockoutObservable<T> | T): instance is KnockoutObservable<T>;
+    isObservable<T = any>(instance: KnockoutAble<T>): instance is KnockoutObservable<T>;
+
     /**
      * Determine if argument is a writable observable. Returns true for observables, observable arrays, and writable computed observables.
      * @param instance Object to be checked.
      */
-    isWriteableObservable(instance: any): instance is KnockoutObservable<any>;
-    /**
-     * Determine if argument is a writable observable. Returns true for observables, observable arrays, and writable computed observables.
-     * @param instance Object to be checked.
-     */
-    isWriteableObservable<T>(instance: KnockoutObservable<T> | T): instance is KnockoutObservable<T>;
+    isWriteableObservable<T = any>(instance: KnockoutAble<T>): instance is KnockoutObservable<T>;
     /**
      * Determine if argument is a computed observable.
      * @param instance Object to be checked.
      */
-    isComputed(instance: any): instance is KnockoutComputed<any>;
-    /**
-     * Determine if argument is a computed observable.
-     * @param instance Object to be checked.
-     */
-    isComputed<T>(instance: KnockoutObservable<T> | T): instance is KnockoutComputed<T>;
+    isComputed<T = any>(instance: KnockoutAble<T>): instance is KnockoutComputed<T>;
 
     /**
      * Returns the data that was available for binding against the element.
@@ -757,7 +769,7 @@ interface KnockoutStatic {
      * Returns the underlying value of the Knockout Observable or in case of plain js object, return the object. Use this to easily accept both observable and plain values.
      * @param instance observable to be unwraped if it's an Observable.
      */
-    unwrap<T>(instance: KnockoutObservable<T> | T): T;
+    unwrap<T>(instance: KnockoutAble<T>): T;
     /**
      * Gets the array inside the KnockoutObservableArray.
      * @param instance observable to be unwraped.
@@ -872,7 +884,6 @@ interface KnockoutStatic {
         value:               The value to be written
         checkIfDifferent:    If true, and if the property being written is a writable observable, the value will only be written if
                              it is !== existing value on that writable observable
-
         Note that if you need to write to the viewModel without an observable property,
         you need to set ko.expressionRewriting.twoWayBindings[key] = true; *before* the binding evaluation.
         */
@@ -1020,7 +1031,6 @@ declare namespace KnockoutComponentTypes {
 }
 
 interface KnockoutComponents {
-
     /**
      * Registers a component, in the default component loader, to be used by name in the component binding.
      * @param componentName Component name. Will be used for your custom HTML tag name.
@@ -1057,8 +1067,8 @@ interface KnockoutComponents {
     getComponentNameForNode(node: Node): string;
 }
 
-declare var ko: KnockoutStatic;
+declare let _ko: KnockoutStatic;
 
 declare module "knockout" {
-    export = ko;
+    export = _ko;
 }
